@@ -3,9 +3,7 @@
 namespace kalanis\kw_menu;
 
 
-use kalanis\kw_menu\Interfaces\IMenu;
 use kalanis\kw_menu\Interfaces\IMNTranslations;
-use kalanis\kw_paths\Stuff;
 
 
 /**
@@ -17,29 +15,26 @@ use kalanis\kw_paths\Stuff;
 class MoreFiles
 {
     /** @var string */
-    protected $metaFile = '';
-    /** @var string */
-    protected $directoryPath = '';
-    /** @var DataProcessor */
+    protected $groupKey = '';
+    /** @var MetaProcessor */
     protected $data = null;
-    /** @var Interfaces\IDataSource */
-    protected $storage = null;
+    /** @var Interfaces\IEntriesSource */
+    protected $dataSource = null;
 
-    public function __construct(Interfaces\IDataSource $storage, string $metaFile = '', ?IMNTranslations $lang = null)
+    public function __construct(Interfaces\IMetaSource $metaSource, Interfaces\IEntriesSource $dataSource, ?IMNTranslations $lang = null)
     {
-        $this->data = new DataProcessor($storage, $lang);
-        $this->storage = $storage;
-        $this->metaFile = !empty($metaFile) ? Stuff::filename($metaFile) : 'index' . IMenu::EXT_MENU ;
+        $this->data = new MetaProcessor($metaSource, $lang);
+        $this->dataSource = $dataSource;
     }
 
     /**
-     * @param string $directoryPath directory
+     * @param string $groupKey directory
      * @return $this
      */
-    public function setPath(string $directoryPath): self
+    public function setGroup(string $groupKey): self
     {
-        $this->directoryPath = Stuff::removeEndingSlash($directoryPath);
-        $this->data->setPath($this->directoryPath . DIRECTORY_SEPARATOR . $this->metaFile);
+        $this->groupKey = $groupKey;
+        $this->data->setKey($groupKey);
         return $this;
     }
 
@@ -63,8 +58,8 @@ class MoreFiles
      */
     protected function createNew(): void
     {
-        foreach ($this->storage->getFiles($this->directoryPath) as $file) {
-            $this->data->add($file);
+        foreach ($this->dataSource->getFiles($this->groupKey) as $file) {
+            $this->data->addEntry($file);
         }
     }
 
@@ -76,7 +71,7 @@ class MoreFiles
         $toRemoval = array_map([$this, 'fileName'], $this->data->getWorking());
         $toRemoval = array_combine($toRemoval, array_fill(0, count($toRemoval), true));
 
-        foreach ($this->storage->getFiles($this->directoryPath) as $file) {
+        foreach ($this->dataSource->getFiles($this->groupKey) as $file) {
             $alreadyKnown = false;
             foreach ($this->data->getWorking() as $item) { # stay
                 if ((!$alreadyKnown) && ($item->getFile() == $file)) {
@@ -85,12 +80,12 @@ class MoreFiles
                 }
             }
             if (!$alreadyKnown) {
-                $this->data->add($file);
+                $this->data->addEntry($file);
             }
         }
         foreach ($this->data->getWorking() as $item) {
             if (!empty($toRemoval[$item->getFile()])) {
-                $this->data->remove($item->getFile());
+                $this->data->removeEntry($item->getFile());
             }
         }
     }
@@ -100,7 +95,7 @@ class MoreFiles
         return $item->getFile();
     }
 
-    public function getData(): DataProcessor
+    public function getData(): MetaProcessor
     {
         return $this->data;
     }

@@ -9,4 +9,8 @@ use PHPUnit\Framework\TestCase;
  */
 class CommonTestClass extends TestCase
 {
+    protected function getTargetPath(): string
+    {
+        return __DIR__ . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'target' . DIRECTORY_SEPARATOR;
+    }
 }

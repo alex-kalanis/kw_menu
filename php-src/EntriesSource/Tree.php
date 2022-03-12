@@ -7,25 +7,33 @@ use kalanis\kw_menu\Interfaces\IDataSource;
 use kalanis\kw_menu\Interfaces\IMNTranslations;
 use kalanis\kw_menu\MenuException;
 use kalanis\kw_menu\Translations;
+use kalanis\kw_paths\Path;
 use kalanis\kw_paths\Stuff;
+use kalanis\kw_tree\Tree as XTree;
+use SplFileInfo;
 use Traversable;
 
 
 /**
- * Class Volume
+ * Class Storage
  * @package kalanis\kw_menu\DataSource
- * Data source is processed directly over volume
+ * Data source is in passed storage
  */
-class Volume implements IDataSource
+class Tree implements IDataSource
 {
+    use TFilterHtml;
+
     /** @var string path to menu dir */
     protected $rootPath = '';
+    /** @var XTree */
+    protected $tree = null;
     /** @var IMNTranslations */
     protected $lang = null;
 
-    public function __construct(string $rootPath, ?IMNTranslations $lang = null)
+    public function __construct(Path $path, ?IMNTranslations $lang = null)
     {
-        $this->rootPath = Stuff::removeEndingSlash($rootPath) . DIRECTORY_SEPARATOR;
+        $this->tree = new XTree($path);
+        $this->rootPath = Stuff::removeEndingSlash($path->getDocumentRoot() . $path->getPathToSystemRoot()) . DIRECTORY_SEPARATOR;
         $this->lang = $lang ?: new Translations();
     }
 
@@ -53,11 +61,17 @@ class Volume implements IDataSource
 
     public function getFiles(string $dir): Traversable
     {
-        yield from array_filter(array_filter(scandir($this->rootPath . $dir), ['\kalanis\kw_paths\Stuff', 'notDots']), [$this, 'filterHtml']);
+        $this->tree->startFromPath($dir);
+        $this->tree->canRecursive(false);
+        $this->tree->setFilterCallback([$this, 'filterHtml']);
+        $this->tree->process();
+        foreach ($this->tree->getTree()->getSubNodes() as $item) {
+            yield $item->getName();
+        }
     }
 
-    public function filterHtml(string $file): bool
+    public function filterHtml(SplFileInfo $info): bool
     {
-        return in_array(Stuff::fileExt($file), ['htm', 'html']);
+        return $this->filterExt($info->getExtension());
     }
 }

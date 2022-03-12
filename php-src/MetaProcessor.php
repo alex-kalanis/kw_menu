@@ -3,7 +3,6 @@
 namespace kalanis\kw_menu;
 
 
-use kalanis\kw_menu\Interfaces\IMenu;
 use kalanis\kw_menu\Interfaces\IMNTranslations;
 
 
@@ -14,10 +13,8 @@ use kalanis\kw_menu\Interfaces\IMNTranslations;
  */
 class DataProcessor
 {
-    /** @var string path to menu file */
-    protected $path = '';
-    /** @var Interfaces\IDataSource|null */
-    protected $storage = null;
+    /** @var Interfaces\IMetaSource|null */
+    protected $metaSource = null;
     /** @var IMNTranslations */
     protected $lang = null;
     /** @var Menu\Menu */
@@ -29,21 +26,12 @@ class DataProcessor
     /** @var Menu\Item[] */
     protected $workList = [];
 
-    public function __construct(Interfaces\IDataSource $storage, ?IMNTranslations $lang = null)
+    public function __construct(Interfaces\IMetaSource $metaSource, ?IMNTranslations $lang = null)
     {
         $this->menu = new Menu\Menu();
         $this->item = new Menu\Item();
-        $this->storage = $storage;
+        $this->metaSource = $metaSource;
         $this->lang = $lang ?: new Translations();
-    }
-
-    public function setPath(string $path): self
-    {
-        $this->path = $path;
-        $this->menu->clear();
-        $this->highest = 0;
-        $this->workList = [];
-        return $this;
     }
 
     /**
@@ -52,16 +40,14 @@ class DataProcessor
      */
     public function exists(): bool
     {
-        return $this->storage->exists($this->path);
+        return $this->metaSource->exists();
     }
 
     /**
      * @return Menu\Menu
-     * @throws MenuException
      */
     public function getMenu(): Menu\Menu
     {
-        $this->load();
         return $this->menu;
     }
 
@@ -70,53 +56,13 @@ class DataProcessor
      */
     public function load(): void
     {
-        if (empty($this->menu->getItems()) && empty($this->menu->getFile()) && !empty($this->path)) {
-            $lines = $this->readLines();
-            $this->loadHeader(reset($lines));
-            $this->loadItems(array_slice($lines, 1));
+        if (empty($this->menu->getItems()) && empty($this->menu->getFile()) && $this->exists()) {
+            $this->menu = $this->metaSource->load();
+            $this->workList = $this->menu->getItems();
         }
     }
 
-    /**
-     * @return string[]
-     * @throws MenuException
-     */
-    protected function readLines(): array
-    {
-        if ($this->storage->exists($this->path)) {
-            return explode("\r\n", $this->storage->load($this->path));
-        }
-        throw new MenuException($this->lang->mnCannotOpen());
-    }
-
-    protected function loadHeader(string $line): void
-    {
-        $headData = explode(IMenu::SEPARATOR, $line);
-        $this->menu->setData((string)$headData[0], (string)$headData[2], (string)$headData[3], (int)$headData[1]);
-    }
-
-    protected function loadItems(array $lines): void
-    {
-        foreach ($lines as $line) {
-            if (empty($line)) {
-                continue;
-            }
-            if (in_array($line[0], ['#', ';'])) {
-                continue;
-            }
-            $data = explode(IMenu::SEPARATOR, $line);
-            if (2 > count($data)) {
-                continue;
-            }
-            $item = clone $this->item;
-            $item->setData((string)$data[2], (string)$data[3], (string)$data[0], (int)$data[1], boolval(intval($data[4])));
-            $this->menu->addItem($item);
-            $this->highest = max($this->highest, $item->getPosition());
-        }
-        $this->workList = $this->menu->getItems();
-    }
-
-    public function updateInfo(string $name, string $desc, int $displayCount): void
+    public function updateInfo(?string $name, ?string $desc, ?int $displayCount): void
     {
         $this->menu->setData(
             $this->menu->getFile(),
@@ -145,7 +91,7 @@ class DataProcessor
         return $this->workList;
     }
 
-    public function add(string $file, string $name = '', string $desc = '', bool $sub = false): void
+    public function addEntry(string $file, string $name = '', string $desc = '', bool $sub = false): void
     {
         if (!$this->getItem($file)) {
             $name = empty($name) ? $file : $name;
@@ -162,7 +108,7 @@ class DataProcessor
      * @param bool|null $sub
      * @throws MenuException
      */
-    public function update(string $file, ?string $name, ?string $desc, ?bool $sub): void
+    public function updateEntry(string $file, ?string $name, ?string $desc, ?bool $sub): void
     {
         # null sign means not free, just unchanged
         $item = $this->getItem($file);
@@ -179,7 +125,7 @@ class DataProcessor
         );
     }
 
-    public function remove(string $file): void
+    public function removeEntry(string $file): void
     {
         if ($item = $this->getItem($file)) {
             unset($this->workList[$item->getFile()]);
@@ -198,6 +144,11 @@ class DataProcessor
             throw new MenuException($this->lang->mnProblematicData());
         }
         $matrix = [];
+        # all at first
+        foreach ($this->workList as &$item) {
+            $matrix[$item->getPosition()] = $item->getPosition();
+        }
+        # updated at second
         foreach ($positions as $file => &$position) {
             if (empty($this->workList[$file])) {
                 throw new MenuException($this->lang->mnItemNotFound($file));
@@ -254,7 +205,7 @@ class DataProcessor
             $workList[$item->getPosition()] = $item->getFile(); # old position contains file ***
         }
 
-        for ($i = 0; $i < $max; $i++) {
+        for ($i = 0; $i <= $max; $i++) {
             if (!empty($workList[$i])) { # position contains data
                 $use[$j] = $workList[$i]; # new position contains file named *** from old one...
                 $j++;
@@ -287,29 +238,16 @@ class DataProcessor
      */
     public function save(): void
     {
-        $content = [];
-        $content[] = implode(IMenu::SEPARATOR, [ // header
+        $this->menu->setData( // reset entries from working list
             $this->menu->getFile(),
-            $this->menu->getDisplayCount(),
             $this->menu->getName(),
             $this->menu->getTitle(),
-            '',
-        ]);
-        $content[] = '#';
-        $this->sortItems();
-        foreach ($this->workList as $item) { // save all! Limit only on render
-            $content[] = implode(IMenu::SEPARATOR, [
-                $item->getFile(),
-                strval($item->getPosition()),
-                $item->getName(),
-                $item->getTitle(),
-                strval(intval($item->canGoSub())),
-                '',
-            ]);
+            $this->menu->getDisplayCount()
+        );
+        foreach ($this->workList as &$item) {
+            $this->menu->addItem($item);
         }
-        $content[] = '';
-
-        $this->storage->save($this->path, implode("\r\n", $content));
+        $this->metaSource->save($this->menu);
     }
 
     protected function sortItems(): void
