@@ -14,7 +14,7 @@ class Menu
     protected $name = '';
     protected $title = '';
     protected $displayCount = 0;
-    /** @var Item[] */
+    /** @var Entry[] */
     protected $items = [];
 
     public function clear(): self
@@ -32,9 +32,9 @@ class Menu
         return $this;
     }
 
-    public function addItem(Item $item): self
+    public function addItem(Entry $item): self
     {
-        $this->items[$item->getFile()] = $item;
+        $this->items[$item->getId()] = $item;
         return $this;
     }
 
@@ -59,7 +59,7 @@ class Menu
     }
 
     /**
-     * @return Item[]
+     * @return Entry[]
      */
     public function getItems(): array
     {

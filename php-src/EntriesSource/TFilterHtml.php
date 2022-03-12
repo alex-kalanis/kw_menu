@@ -1,14 +1,11 @@
 <?php
 
-namespace kalanis\kw_menu\DataSource;
-
-
-use SplFileInfo;
+namespace kalanis\kw_menu\EntriesSource;
 
 
 /**
  * Trait TFilterHtml
- * @package kalanis\kw_menu\DataSource
+ * @package kalanis\kw_menu\EntriesSource
  */
 trait TFilterHtml
 {

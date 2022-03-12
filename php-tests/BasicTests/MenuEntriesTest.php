@@ -3,7 +3,7 @@
 namespace BasicTests;
 
 
-use kalanis\kw_menu\Menu\Item;
+use kalanis\kw_menu\Menu\Entry;
 use kalanis\kw_menu\Menu\Menu;
 
 
@@ -11,18 +11,18 @@ class MenuEntriesTest extends \CommonTestClass
 {
     /**
      * @param string $name
-     * @param string $title
-     * @param string $file
+     * @param string $desc
+     * @param string $id
      * @param int $position
      * @param bool $sub
      * @dataProvider contentProvider
      */
-    public function testItem(string $name, string $title, string $file, int $position, bool $sub): void
+    public function testItem(string $name, string $desc, string $id, int $position, bool $sub): void
     {
-        $lib = new Item();
-        $lib->setData($name, $title, $file, $position, $sub);
+        $lib = new Entry();
+        $lib->setData($id, $name, $desc, $position, $sub);
         $this->assertEquals($name, $lib->getName());
-        $this->assertEquals($title, $lib->getTitle());
+        $this->assertEquals($desc, $lib->getDesc());
         $this->assertEquals($position, $lib->getPosition());
         $this->assertEquals($sub, $lib->canGoSub());
     }
@@ -51,28 +51,28 @@ class MenuEntriesTest extends \CommonTestClass
         $lib = new Menu();
         $lib->setData('abc', 'def', 'ghi', 11);
         $this->assertEmpty($lib->getItems());
-        foreach ($this->contentProvider() as list($name, $title, $file, $position, $sub)) {
-            $item = new Item();
-            $item->setData($name, $title, $file, $position, $sub);
-            $lib->addItem($item);
+        foreach ($this->contentProvider() as list($name, $desc, $id, $position, $sub)) {
+            $entry = new Entry();
+            $entry->setData($id, $name, $desc, $position, $sub);
+            $lib->addItem($entry);
         }
         $this->assertNotEmpty($lib->getItems());
     }
 
     public function testSubMenu(): void
     {
-        $item = new Item();
-        $item->setData('jkl', 'mno', 'pqr', 3, true);
+        $entry = new Entry();
+        $entry->setData('jkl', 'mno', 'pqr', 3, true);
 
-        $this->assertEquals(3, $item->getPosition());
-        $item->setPosition(1);
-        $this->assertEquals(1, $item->getPosition());
-        $this->assertEmpty($item->getSubmenu());
+        $this->assertEquals(3, $entry->getPosition());
+        $entry->setPosition(1);
+        $this->assertEquals(1, $entry->getPosition());
+        $this->assertEmpty($entry->getSubmenu());
 
         $lib = new Menu();
         $lib->setData('abc', 'def', 'ghi', 11);
-        $item->addSubmenu($lib);
-        $this->assertNotEmpty($item->getSubmenu());
+        $entry->addSubmenu($lib);
+        $this->assertNotEmpty($entry->getSubmenu());
     }
 
     public function contentProvider(): array

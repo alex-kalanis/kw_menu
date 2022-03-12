@@ -3,9 +3,11 @@
 namespace ProcessingTests;
 
 
-use kalanis\kw_menu\DataSource\Volume;
+use kalanis\kw_menu\EntriesSource;
+use kalanis\kw_menu\MetaProcessor;
+use kalanis\kw_menu\MetaSource;
 use kalanis\kw_menu\MenuException;
-use kalanis\kw_menu\MoreFiles;
+use kalanis\kw_menu\MoreEntries;
 
 
 class FilesTest extends \CommonTestClass
@@ -15,13 +17,13 @@ class FilesTest extends \CommonTestClass
      */
     public function testExisting(): void
     {
-        // in volume it's document root
-        // in path then the currently opened path
-        // name of metafile must stay the same across the project
-        $lib = new MoreFiles(new Volume($this->getTargetPath()), 'target.meta'); // meta with data
-        $lib->setPath(''); // dir with data
+        // in meta source the path targets the meta file with records of entries
+        // in entries source the path targets the directory with files or or group identifier of entries
+        $path = $this->getTargetPath();
+        $lib = new MoreEntries(new MetaProcessor(new MetaSource\Volume($path, new MetaSource\FileParser())), new EntriesSource\Volume($path)); // meta with data
+        $lib->setMeta('target.meta'); // dir with data
         $lib->load();
-        $this->assertNotEmpty($lib->getData());
+        $this->assertNotEmpty($lib->getMeta());
     }
 
     /**
@@ -29,9 +31,11 @@ class FilesTest extends \CommonTestClass
      */
     public function testNew(): void
     {
-        $lib = new MoreFiles(new Volume($this->getTargetPath()), 'copy.meta'); // meta with data
-        $lib->setPath('dummy3'); // dir with data
+        $path = $this->getTargetPath();
+        $lib = new MoreEntries(new MetaProcessor(new MetaSource\Volume($path, new MetaSource\FileParser())), new EntriesSource\Volume($path)); // meta with data
+        $lib->setGroupKey('dummy3'); // dir with data
+        $lib->setMeta('copy.meta'); // dir with data
         $lib->load();
-        $this->assertNotEmpty($lib->getData());
+        $this->assertNotEmpty($lib->getMeta());
     }
 }

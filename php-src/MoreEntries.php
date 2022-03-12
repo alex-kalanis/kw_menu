@@ -3,38 +3,45 @@
 namespace kalanis\kw_menu;
 
 
-use kalanis\kw_menu\Interfaces\IMNTranslations;
-
-
 /**
- * Class MoreFiles
+ * Class MoreEntries
  * @package kalanis\kw_menu
  * Process the menu against the file tree
- * Load more already unloaded files and remove non-existing ones
+ * Load more already unloaded entries and remove non-existing ones
  */
-class MoreFiles
+class MoreEntries
 {
     /** @var string */
     protected $groupKey = '';
     /** @var MetaProcessor */
-    protected $data = null;
+    protected $meta = null;
     /** @var Interfaces\IEntriesSource */
     protected $dataSource = null;
 
-    public function __construct(Interfaces\IMetaSource $metaSource, Interfaces\IEntriesSource $dataSource, ?IMNTranslations $lang = null)
+    public function __construct(MetaProcessor $metaSource, Interfaces\IEntriesSource $dataSource)
     {
-        $this->data = new MetaProcessor($metaSource, $lang);
+        $this->meta = $metaSource;
         $this->dataSource = $dataSource;
     }
 
     /**
-     * @param string $groupKey directory
+     * @param string $groupKey directory to scan
      * @return $this
      */
-    public function setGroup(string $groupKey): self
+    public function setGroupKey(string $groupKey): self
     {
         $this->groupKey = $groupKey;
-        $this->data->setKey($groupKey);
+        return $this;
+    }
+
+    /**
+     * @param string $metaKey file/id with meta data
+     * @return $this
+     * @throws MenuException
+     */
+    public function setMeta(string $metaKey): self
+    {
+        $this->meta->setKey($metaKey);
         return $this;
     }
 
@@ -44,8 +51,8 @@ class MoreFiles
      */
     public function load(): self
     {
-        if ($this->data->exists()) {
-            $this->data->load();
+        if ($this->meta->exists()) {
+            $this->meta->load();
             $this->fillMissing();
         } else {
             $this->createNew();
@@ -59,7 +66,7 @@ class MoreFiles
     protected function createNew(): void
     {
         foreach ($this->dataSource->getFiles($this->groupKey) as $file) {
-            $this->data->addEntry($file);
+            $this->meta->addEntry($file);
         }
     }
 
@@ -68,35 +75,35 @@ class MoreFiles
      */
     protected function fillMissing(): void
     {
-        $toRemoval = array_map([$this, 'fileName'], $this->data->getWorking());
+        $toRemoval = array_map([$this, 'fileName'], $this->meta->getWorking());
         $toRemoval = array_combine($toRemoval, array_fill(0, count($toRemoval), true));
 
         foreach ($this->dataSource->getFiles($this->groupKey) as $file) {
             $alreadyKnown = false;
-            foreach ($this->data->getWorking() as $item) { # stay
-                if ((!$alreadyKnown) && ($item->getFile() == $file)) {
+            foreach ($this->meta->getWorking() as $item) { # stay
+                if ((!$alreadyKnown) && ($item->getId() == $file)) {
                     $alreadyKnown = true;
-                    $toRemoval[$item->getFile()] = false;
+                    $toRemoval[$item->getId()] = false;
                 }
             }
             if (!$alreadyKnown) {
-                $this->data->addEntry($file);
+                $this->meta->addEntry($file);
             }
         }
-        foreach ($this->data->getWorking() as $item) {
-            if (!empty($toRemoval[$item->getFile()])) {
-                $this->data->removeEntry($item->getFile());
+        foreach ($this->meta->getWorking() as $item) {
+            if (!empty($toRemoval[$item->getId()])) {
+                $this->meta->removeEntry($item->getId());
             }
         }
     }
 
-    public function fileName(Menu\Item $item): string
+    public function fileName(Menu\Entry $item): string
     {
-        return $item->getFile();
+        return $item->getId();
     }
 
-    public function getData(): MetaProcessor
+    public function getMeta(): MetaProcessor
     {
-        return $this->data;
+        return $this->meta;
     }
 }

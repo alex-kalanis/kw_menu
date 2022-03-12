@@ -7,11 +7,11 @@ use kalanis\kw_menu\Interfaces\IMNTranslations;
 
 
 /**
- * Class DataProcessor
+ * Class MetaProcessor
  * @package kalanis\kw_menu
  * Menu data processor - CRUD
  */
-class DataProcessor
+class MetaProcessor
 {
     /** @var Interfaces\IMetaSource|null */
     protected $metaSource = null;
@@ -19,19 +19,30 @@ class DataProcessor
     protected $lang = null;
     /** @var Menu\Menu */
     protected $menu = null;
-    /** @var Menu\Item */
-    protected $item = null;
+    /** @var Menu\Entry */
+    protected $entry = null;
     /** @var int */
     protected $highest = 0;
-    /** @var Menu\Item[] */
+    /** @var Menu\Entry[] */
     protected $workList = [];
 
     public function __construct(Interfaces\IMetaSource $metaSource, ?IMNTranslations $lang = null)
     {
         $this->menu = new Menu\Menu();
-        $this->item = new Menu\Item();
+        $this->entry = new Menu\Entry();
         $this->metaSource = $metaSource;
         $this->lang = $lang ?: new Translations();
+    }
+
+    /**
+     * @param string $metaSource
+     * @return $this
+     * @throws MenuException
+     */
+    public function setKey(string $metaSource): self
+    {
+        $this->metaSource->setSource($metaSource);
+        return $this;
     }
 
     /**
@@ -59,7 +70,13 @@ class DataProcessor
         if (empty($this->menu->getItems()) && empty($this->menu->getFile()) && $this->exists()) {
             $this->menu = $this->metaSource->load();
             $this->workList = $this->menu->getItems();
+            $this->highest = max(array_map([$this, 'menuPosition'], $this->workList));
         }
+    }
+
+    public function menuPosition(Menu\Entry $item): int
+    {
+        return $item->getPosition();
     }
 
     public function updateInfo(?string $name, ?string $desc, ?int $displayCount): void
@@ -72,18 +89,18 @@ class DataProcessor
         );
     }
 
-    public function getItem(string $file): ?Menu\Item
+    public function getEntry(string $id): ?Menu\Entry
     {
-        foreach ($this->workList as &$item) {
-            if ($item->getFile() == $file) {
-                return $item;
+        foreach ($this->workList as &$entry) {
+            if ($entry->getId() == $id) {
+                return $entry;
             }
         }
         return null;
     }
 
     /**
-     * @return Menu\Item[]
+     * @return Menu\Entry[]
      */
     public function getWorking(): array
     {
@@ -91,55 +108,55 @@ class DataProcessor
         return $this->workList;
     }
 
-    public function addEntry(string $file, string $name = '', string $desc = '', bool $sub = false): void
+    public function addEntry(string $id, string $name = '', string $desc = '', bool $sub = false): void
     {
-        if (!$this->getItem($file)) {
-            $name = empty($name) ? $file : $name;
-            $item = clone $this->item;
+        if (!$this->getEntry($id)) {
+            $name = empty($name) ? $id : $name;
+            $item = clone $this->entry;
             $this->highest++;
-            $this->workList[$file] = $item->setData($name, $desc, $file, $this->highest, $sub);
+            $this->workList[$id] = $item->setData($id, $name, $desc, $this->highest, $sub);
         }
     }
 
     /**
-     * @param string $file
+     * @param string $id
      * @param string|null $name
      * @param string|null $desc
      * @param bool|null $sub
      * @throws MenuException
      */
-    public function updateEntry(string $file, ?string $name, ?string $desc, ?bool $sub): void
+    public function updateEntry(string $id, ?string $name, ?string $desc, ?bool $sub): void
     {
         # null sign means not free, just unchanged
-        $item = $this->getItem($file);
+        $item = $this->getEntry($id);
         if (!$item) {
-            throw new MenuException($this->lang->mnItemNotFound($file));
+            throw new MenuException($this->lang->mnItemNotFound($id));
         }
 
         $item->setData(
+            $id,
             is_null($name) ? $item->getName() : $name,
-            is_null($desc) ? $item->getTitle() : $desc,
-            $file,
+            is_null($desc) ? $item->getDesc() : $desc,
             $item->getPosition(),
             is_null($sub) ? $item->canGoSub() : $sub
         );
     }
 
-    public function removeEntry(string $file): void
+    public function removeEntry(string $id): void
     {
-        if ($item = $this->getItem($file)) {
-            unset($this->workList[$item->getFile()]);
+        if ($item = $this->getEntry($id)) {
+            unset($this->workList[$item->getId()]);
         }
     }
 
     /**
+     * get assoc array with new positioning of files
+     * key is file name, value is new position
      * @param array<string, int> $positions
      * @throws MenuException
      */
     public function rearrangePositions(array $positions): void
     {
-        # get assoc array with new positioning of files
-        # key is file name, value is new position
         if (empty($positions)) {
             throw new MenuException($this->lang->mnProblematicData());
         }
@@ -149,14 +166,14 @@ class DataProcessor
             $matrix[$item->getPosition()] = $item->getPosition();
         }
         # updated at second
-        foreach ($positions as $file => &$position) {
-            if (empty($this->workList[$file])) {
-                throw new MenuException($this->lang->mnItemNotFound($file));
+        foreach ($positions as $id => &$position) {
+            if (empty($this->workList[$id])) {
+                throw new MenuException($this->lang->mnItemNotFound($id));
             }
             if (!is_numeric($position)) {
                 throw new MenuException($this->lang->mnProblematicData());
             }
-            $matrix[$this->workList[$file]->getPosition()] = intval($position);
+            $matrix[$this->workList[$id]->getPosition()] = intval($position);
         }
 
         $prepared = [];
@@ -199,10 +216,10 @@ class DataProcessor
         $hole = false;
         $j = 0;
 
-        /** @var Menu\Item[] $workList */
+        /** @var Menu\Entry[] $workList */
         $workList = [];
         foreach ($this->workList as &$item) {
-            $workList[$item->getPosition()] = $item->getFile(); # old position contains file ***
+            $workList[$item->getPosition()] = $item->getId(); # old position contains file ***
         }
 
         for ($i = 0; $i <= $max; $i++) {
@@ -219,7 +236,7 @@ class DataProcessor
         $use = array_flip($use); # flip back to names as PK
 
         foreach ($this->workList as &$item) {
-            $item->setPosition($use[$item->getFile()]);
+            $item->setPosition($use[$item->getId()]);
         }
     }
 
@@ -228,7 +245,7 @@ class DataProcessor
         return (int)array_reduce($this->workList, [$this, 'maxPosition'], 0);
     }
 
-    public function maxPosition($carry, Menu\Item $item)
+    public function maxPosition($carry, Menu\Entry $item)
     {
         return max($carry, $item->getPosition());
     }
@@ -255,7 +272,7 @@ class DataProcessor
         uasort($this->workList, [$this, 'sortWorkList']);
     }
 
-    public function sortWorkList(Menu\Item $a, Menu\Item $b)
+    public function sortWorkList(Menu\Entry $a, Menu\Entry $b)
     {
         return $a->getPosition() <=> $b->getPosition();
     }
