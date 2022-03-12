@@ -88,7 +88,7 @@ class FileParser implements Interfaces\IMetaFileParser
             '',
         ]);
         $content[] = '#';
-        foreach ($menu->getItems() as $item) { // save all! Limit only on render
+        foreach ($menu->getEntries() as $item) { // save all! Limit only on render
             $content[] = implode(Interfaces\IMenu::SEPARATOR, [
                 $this->escapeNl($item->getId()),
                 strval($item->getPosition()),

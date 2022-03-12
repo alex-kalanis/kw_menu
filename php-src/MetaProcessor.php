@@ -67,10 +67,10 @@ class MetaProcessor
      */
     public function load(): void
     {
-        if (empty($this->menu->getItems()) && empty($this->menu->getFile()) && $this->exists()) {
+        if (empty($this->menu->getEntries()) && empty($this->menu->getFile()) && $this->exists()) {
             $this->menu = $this->metaSource->load();
-            $this->workList = $this->menu->getItems();
-            $this->highest = max(array_map([$this, 'menuPosition'], $this->workList));
+            $this->workList = $this->menu->getEntries();
+            $this->highest = max([0] + array_map([$this, 'menuPosition'], $this->workList));
         }
     }
 

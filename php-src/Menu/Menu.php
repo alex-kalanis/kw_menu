@@ -15,7 +15,7 @@ class Menu
     protected $title = '';
     protected $displayCount = 0;
     /** @var Entry[] */
-    protected $items = [];
+    protected $entries = [];
 
     public function clear(): self
     {
@@ -28,13 +28,13 @@ class Menu
         $this->title = (string)$title;
         $this->file = (string)$file;
         $this->displayCount = (string)$count;
-        $this->items = [];
+        $this->entries = [];
         return $this;
     }
 
-    public function addItem(Entry $item): self
+    public function addItem(Entry $entry): self
     {
-        $this->items[$item->getId()] = $item;
+        $this->entries[$entry->getId()] = $entry;
         return $this;
     }
 
@@ -61,8 +61,8 @@ class Menu
     /**
      * @return Entry[]
      */
-    public function getItems(): array
+    public function getEntries(): array
     {
-        return $this->items;
+        return $this->entries;
     }
 }

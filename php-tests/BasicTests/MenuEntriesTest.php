@@ -50,13 +50,13 @@ class MenuEntriesTest extends \CommonTestClass
     {
         $lib = new Menu();
         $lib->setData('abc', 'def', 'ghi', 11);
-        $this->assertEmpty($lib->getItems());
+        $this->assertEmpty($lib->getEntries());
         foreach ($this->contentProvider() as list($name, $desc, $id, $position, $sub)) {
             $entry = new Entry();
             $entry->setData($id, $name, $desc, $position, $sub);
             $lib->addItem($entry);
         }
-        $this->assertNotEmpty($lib->getItems());
+        $this->assertNotEmpty($lib->getEntries());
     }
 
     public function testSubMenu(): void
