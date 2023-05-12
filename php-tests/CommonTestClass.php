@@ -22,3 +22,27 @@ class CommonTestClass extends TestCase
         return __DIR__ . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'target' . DIRECTORY_SEPARATOR;
     }
 }
+
+
+class XFailStorage extends \kalanis\kw_storage\Storage\Storage
+{
+    public function write(string $sharedKey, $data, ?int $timeout = null): bool
+    {
+        throw new \kalanis\kw_storage\StorageException('mock');
+    }
+
+    public function read(string $sharedKey)
+    {
+        throw new \kalanis\kw_storage\StorageException('mock');
+    }
+
+    public function exists(string $sharedKey): bool
+    {
+        throw new \kalanis\kw_storage\StorageException('mock');
+    }
+
+    public function lookup(string $mask): Traversable
+    {
+        throw new \kalanis\kw_storage\StorageException('mock');
+    }
+}

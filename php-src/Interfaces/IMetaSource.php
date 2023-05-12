@@ -21,21 +21,21 @@ interface IMetaSource
     public function setSource(string $groupKey): void;
 
     /**
-     * @return bool
      * @throws MenuException
+     * @return bool
      */
     public function exists(): bool;
 
     /**
-     * @return Menu
      * @throws MenuException
+     * @return Menu
      */
     public function load(): Menu;
 
     /**
      * @param Menu $content
-     * @return bool
      * @throws MenuException
+     * @return bool
      */
     public function save(Menu $content): bool;
 }

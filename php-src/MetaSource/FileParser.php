@@ -52,6 +52,10 @@ class FileParser implements Interfaces\IMetaFileParser
         );
     }
 
+    /**
+     * @param Menu $menu
+     * @param string[] $lines
+     */
     protected function loadItems(Menu $menu, array $lines): void
     {
         foreach ($lines as $line) {

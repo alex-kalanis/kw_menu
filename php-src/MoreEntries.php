@@ -3,6 +3,9 @@
 namespace kalanis\kw_menu;
 
 
+use kalanis\kw_paths\PathsException;
+
+
 /**
  * Class MoreEntries
  * @package kalanis\kw_menu
@@ -11,8 +14,8 @@ namespace kalanis\kw_menu;
  */
 class MoreEntries
 {
-    /** @var string */
-    protected $groupKey = '';
+    /** @var string[] */
+    protected $groupKey = [];
     /** @var MetaProcessor */
     protected $meta = null;
     /** @var Interfaces\IEntriesSource */
@@ -25,10 +28,10 @@ class MoreEntries
     }
 
     /**
-     * @param string $groupKey directory to scan
+     * @param string[] $groupKey directory to scan
      * @return $this
      */
-    public function setGroupKey(string $groupKey): self
+    public function setGroupKey(array $groupKey): self
     {
         $this->groupKey = $groupKey;
         return $this;
@@ -46,8 +49,9 @@ class MoreEntries
     }
 
     /**
-     * @return $this
      * @throws MenuException
+     * @throws PathsException
+     * @return $this
      */
     public function load(): self
     {
@@ -62,6 +66,7 @@ class MoreEntries
 
     /**
      * @throws MenuException
+     * @throws PathsException
      */
     protected function createNew(): void
     {
@@ -72,6 +77,7 @@ class MoreEntries
 
     /**
      * @throws MenuException
+     * @throws PathsException
      */
     protected function fillMissing(): void
     {

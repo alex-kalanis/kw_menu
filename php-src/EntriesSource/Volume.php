@@ -25,9 +25,10 @@ class Volume implements IEntriesSource
         $this->rootPath = Stuff::removeEndingSlash($rootPath) . DIRECTORY_SEPARATOR;
     }
 
-    public function getFiles(string $dir): Traversable
+    public function getFiles(array $path): Traversable
     {
-        yield from array_filter(array_filter(scandir($this->rootPath . $dir), ['\kalanis\kw_paths\Stuff', 'notDots']), [$this, 'filterHtml']);
+        $dir = Stuff::arrayToPath($path);
+        yield from array_filter(array_filter(scandir($this->rootPath . $dir), [Stuff::class, 'notDots']), [$this, 'filterHtml']);
     }
 
     public function filterHtml(string $fileName): bool

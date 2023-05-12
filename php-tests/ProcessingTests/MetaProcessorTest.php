@@ -5,7 +5,6 @@ namespace ProcessingTests;
 
 use kalanis\kw_menu\MetaProcessor;
 use kalanis\kw_menu\MetaSource;
-use kalanis\kw_menu\MetaSource\Volume;
 use kalanis\kw_menu\MenuException;
 
 

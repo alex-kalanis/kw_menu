@@ -8,12 +8,14 @@ use kalanis\kw_menu\MetaProcessor;
 use kalanis\kw_menu\MetaSource;
 use kalanis\kw_menu\MenuException;
 use kalanis\kw_menu\MoreEntries;
+use kalanis\kw_paths\PathsException;
 
 
 class FilesTest extends \CommonTestClass
 {
     /**
      * @throws MenuException
+     * @throws PathsException
      */
     public function testExisting(): void
     {
@@ -28,12 +30,13 @@ class FilesTest extends \CommonTestClass
 
     /**
      * @throws MenuException
+     * @throws PathsException
      */
     public function testNew(): void
     {
         $path = $this->getTargetPath();
         $lib = new MoreEntries(new MetaProcessor(new MetaSource\Volume($path, new MetaSource\FileParser())), new EntriesSource\Volume($path)); // meta with data
-        $lib->setGroupKey('dummy3'); // dir with data
+        $lib->setGroupKey(['dummy3']); // dir with data
         $lib->setMeta('copy.meta'); // dir with data
         $lib->load();
         $this->assertNotEmpty($lib->getMeta());

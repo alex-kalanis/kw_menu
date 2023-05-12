@@ -4,8 +4,9 @@ namespace kalanis\kw_menu\EntriesSource;
 
 
 use kalanis\kw_menu\Interfaces\IEntriesSource;
+use kalanis\kw_paths\ArrayPath;
 use kalanis\kw_paths\Path;
-use kalanis\kw_tree\Tree as XTree;
+use kalanis\kw_tree as XTree;
 use SplFileInfo;
 use Traversable;
 
@@ -19,22 +20,25 @@ class Tree implements IEntriesSource
 {
     use TFilterHtml;
 
-    /** @var XTree */
+    /** @var XTree\DataSources\Volume */
     protected $tree = null;
+    /** @var ArrayPath */
+    protected $arrPath = null;
 
     public function __construct(Path $path)
     {
-        $this->tree = new XTree($path);
+        $this->tree = new XTree\DataSources\Volume($path->getDocumentRoot() . $path->getPathToSystemRoot());
+        $this->arrPath = new ArrayPath();
     }
 
-    public function getFiles(string $dir): Traversable
+    public function getFiles(array $path): Traversable
     {
-        $this->tree->startFromPath($dir);
-        $this->tree->canRecursive(false);
+        $this->tree->setStartPath($path);
+        $this->tree->wantDeep(false);
         $this->tree->setFilterCallback([$this, 'filterHtml']);
         $this->tree->process();
-        foreach ($this->tree->getTree()->getSubNodes() as $item) {
-            yield $item->getName();
+        foreach ($this->tree->getRoot()->getSubNodes() as $item) {
+            yield $this->arrPath->setArray($item->getPath())->getFileName();
         }
     }
 

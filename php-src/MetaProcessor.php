@@ -242,12 +242,12 @@ class MetaProcessor
 
     protected function getHighestKnownPosition(): int
     {
-        return (int)array_reduce($this->workList, [$this, 'maxPosition'], 0);
+        return intval(array_reduce($this->workList, [$this, 'maxPosition'], 0));
     }
 
-    public function maxPosition($carry, Menu\Entry $item)
+    public function maxPosition(int $carry, Menu\Entry $item): int
     {
-        return max($carry, $item->getPosition());
+        return intval(max($carry, $item->getPosition()));
     }
 
     /**
@@ -272,7 +272,7 @@ class MetaProcessor
         uasort($this->workList, [$this, 'sortWorkList']);
     }
 
-    public function sortWorkList(Menu\Entry $a, Menu\Entry $b)
+    public function sortWorkList(Menu\Entry $a, Menu\Entry $b): int
     {
         return $a->getPosition() <=> $b->getPosition();
     }

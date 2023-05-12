@@ -10,6 +10,7 @@ namespace kalanis\kw_menu\MetaSource;
  */
 trait TEscape
 {
+    /** @var array<string, string> */
     protected static $escapeNlTr = [
         '|' => '---!!::SEP::!!---',
         "\r\n" => '---!!::CRLF::!!---',

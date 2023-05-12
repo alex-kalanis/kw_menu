@@ -1,5 +1,14 @@
 # kw_menu
 
+
+[![Build Status](https://app.travis-ci.com/alex-kalanis/kw_menu.svg?branch=master)](https://app.travis-ci.com/github/alex-kalanis/kw_menu)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/alex-kalanis/kw_menu/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/alex-kalanis/kw_menu/?branch=master)
+[![Latest Stable Version](https://poser.pugx.org/alex-kalanis/kw_menu/v/stable.svg?v=1)](https://packagist.org/packages/alex-kalanis/kw_menu)
+[![Minimum PHP Version](https://img.shields.io/badge/php-%3E%3D%207.3-8892BF.svg)](https://php.net/)
+[![Downloads](https://img.shields.io/packagist/dt/alex-kalanis/kw_menu.svg?v1)](https://packagist.org/packages/alex-kalanis/kw_menu)
+[![License](https://poser.pugx.org/alex-kalanis/kw_menu/license.svg?v=1)](https://packagist.org/packages/alex-kalanis/kw_menu)
+[![Code Coverage](https://scrutinizer-ci.com/g/alex-kalanis/kw_menu/badges/coverage.png?b=master&v=1)](https://scrutinizer-ci.com/g/alex-kalanis/kw_menu/?branch=master)
+
 Mapping menu from different sources and make the tree necessary to process everything.
 This version supports only files as entries in data source. If Storage is in database
 it's possible to map that source. You can also make your own implementation
