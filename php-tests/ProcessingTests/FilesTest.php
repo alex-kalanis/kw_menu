@@ -23,7 +23,7 @@ class FilesTest extends \CommonTestClass
         // in entries source the path targets the directory with files or or group identifier of entries
         $path = $this->getTargetPath();
         $lib = new MoreEntries(new MetaProcessor(new MetaSource\Volume($path, new MetaSource\FileParser())), new EntriesSource\Volume($path)); // meta with data
-        $lib->setMeta('target.meta'); // dir with data
+        $lib->setMeta(['target.meta']); // file with meta data
         $lib->load();
         $this->assertNotEmpty($lib->getMeta());
     }
@@ -37,7 +37,7 @@ class FilesTest extends \CommonTestClass
         $path = $this->getTargetPath();
         $lib = new MoreEntries(new MetaProcessor(new MetaSource\Volume($path, new MetaSource\FileParser())), new EntriesSource\Volume($path)); // meta with data
         $lib->setGroupKey(['dummy3']); // dir with data
-        $lib->setMeta('copy.meta'); // dir with data
+        $lib->setMeta(['copy.meta']); // file with meta data
         $lib->load();
         $this->assertNotEmpty($lib->getMeta());
     }

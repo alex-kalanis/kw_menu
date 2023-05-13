@@ -1,11 +1,11 @@
 <?php
 
-namespace kalanis\kw_menu\EntriesSource;
+namespace kalanis\kw_menu\Traits;
 
 
 /**
  * Trait TFilterHtml
- * @package kalanis\kw_menu\EntriesSource
+ * @package kalanis\kw_menu\Traits
  */
 trait TFilterHtml
 {

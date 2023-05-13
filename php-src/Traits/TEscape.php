@@ -1,11 +1,11 @@
 <?php
 
-namespace kalanis\kw_menu\MetaSource;
+namespace kalanis\kw_menu\Traits;
 
 
 /**
  * Trait TEscape
- * @package kalanis\kw_menu\MetaSource
+ * @package kalanis\kw_menu\Traits
  * Escape special characters in classical meta files
  */
 trait TEscape

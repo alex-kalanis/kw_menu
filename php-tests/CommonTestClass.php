@@ -21,6 +21,11 @@ class CommonTestClass extends TestCase
     {
         return __DIR__ . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'target' . DIRECTORY_SEPARATOR;
     }
+
+    protected function getTargetPath2(): string
+    {
+        return __DIR__ . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'target';
+    }
 }
 
 

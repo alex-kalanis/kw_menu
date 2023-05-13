@@ -38,11 +38,11 @@ class MoreEntries
     }
 
     /**
-     * @param string $metaKey file/id with meta data
-     * @return $this
+     * @param string[] $metaKey file/id with meta data
      * @throws MenuException
+     * @return $this
      */
-    public function setMeta(string $metaKey): self
+    public function setMeta(array $metaKey): self
     {
         $this->meta->setKey($metaKey);
         return $this;

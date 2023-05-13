@@ -4,6 +4,7 @@ namespace kalanis\kw_menu;
 
 
 use kalanis\kw_menu\Interfaces\IMNTranslations;
+use kalanis\kw_menu\Traits\TLang;
 
 
 /**
@@ -13,10 +14,10 @@ use kalanis\kw_menu\Interfaces\IMNTranslations;
  */
 class MetaProcessor
 {
+    use TLang;
+
     /** @var Interfaces\IMetaSource|null */
     protected $metaSource = null;
-    /** @var IMNTranslations */
-    protected $lang = null;
     /** @var Menu\Menu */
     protected $menu = null;
     /** @var Menu\Entry */
@@ -31,15 +32,15 @@ class MetaProcessor
         $this->menu = new Menu\Menu();
         $this->entry = new Menu\Entry();
         $this->metaSource = $metaSource;
-        $this->lang = $lang ?: new Translations();
+        $this->setMnLang($lang);
     }
 
     /**
-     * @param string $metaSource
+     * @param string[] $metaSource
      * @return $this
      * @throws MenuException
      */
-    public function setKey(string $metaSource): self
+    public function setKey(array $metaSource): self
     {
         $this->metaSource->setSource($metaSource);
         return $this;
@@ -130,7 +131,7 @@ class MetaProcessor
         # null sign means not free, just unchanged
         $item = $this->getEntry($id);
         if (!$item) {
-            throw new MenuException($this->lang->mnItemNotFound($id));
+            throw new MenuException($this->getMnLang()->mnItemNotFound($id));
         }
 
         $item->setData(
@@ -158,7 +159,7 @@ class MetaProcessor
     public function rearrangePositions(array $positions): void
     {
         if (empty($positions)) {
-            throw new MenuException($this->lang->mnProblematicData());
+            throw new MenuException($this->getMnLang()->mnProblematicData());
         }
         $matrix = [];
         # all at first
@@ -168,10 +169,10 @@ class MetaProcessor
         # updated at second
         foreach ($positions as $id => &$position) {
             if (empty($this->workList[$id])) {
-                throw new MenuException($this->lang->mnItemNotFound($id));
+                throw new MenuException($this->getMnLang()->mnItemNotFound($id));
             }
             if (!is_numeric($position)) {
-                throw new MenuException($this->lang->mnProblematicData());
+                throw new MenuException($this->getMnLang()->mnProblematicData());
             }
             $matrix[$this->workList[$id]->getPosition()] = intval($position);
         }

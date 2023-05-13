@@ -15,10 +15,10 @@ use kalanis\kw_menu\MenuException;
 interface IMetaSource
 {
     /**
-     * @param string $groupKey
+     * @param string[] $groupKey
      * @throws MenuException
      */
-    public function setSource(string $groupKey): void;
+    public function setSource(array $groupKey): void;
 
     /**
      * @throws MenuException

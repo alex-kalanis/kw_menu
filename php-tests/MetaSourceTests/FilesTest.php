@@ -3,18 +3,22 @@
 namespace MetaSourceTests;
 
 
+use kalanis\kw_files\Access\Factory;
+use kalanis\kw_files\FilesException;
 use kalanis\kw_menu\Menu\Menu;
 use kalanis\kw_menu\MetaSource;
 use kalanis\kw_menu\MenuException;
+use kalanis\kw_paths\PathsException;
 use kalanis\kw_storage\Storage\Key;
-use kalanis\kw_storage\Storage\Storage;
 use kalanis\kw_storage\Storage\Target;
 
 
-class StorageTest extends \CommonTestClass
+class FilesTest extends \CommonTestClass
 {
     /**
+     * @throws FilesException
      * @throws MenuException
+     * @throws PathsException
      */
     public function testProcess(): void
     {
@@ -30,19 +34,9 @@ class StorageTest extends \CommonTestClass
     }
 
     /**
+     * @throws FilesException
      * @throws MenuException
-     */
-    public function testCannotRead(): void
-    {
-        $lib = $this->getLib();
-        chmod($this->getTargetPath() . 'unable.meta', 0222);
-        $lib->setSource(['unable.meta']);
-        $this->expectException(MenuException::class);
-        $lib->load();
-    }
-
-    /**
-     * @throws MenuException
+     * @throws PathsException
      */
     public function testFailedMeta(): void
     {
@@ -52,7 +46,9 @@ class StorageTest extends \CommonTestClass
     }
 
     /**
+     * @throws FilesException
      * @throws MenuException
+     * @throws PathsException
      */
     public function testFailedLoad(): void
     {
@@ -62,7 +58,9 @@ class StorageTest extends \CommonTestClass
     }
 
     /**
+     * @throws FilesException
      * @throws MenuException
+     * @throws PathsException
      */
     public function testFailedSave(): void
     {
@@ -72,24 +70,22 @@ class StorageTest extends \CommonTestClass
     }
 
     /**
-     * @throws MenuException
+     * @throws FilesException
+     * @throws PathsException
+     * @return MetaSource\Files
      */
-    public function testCannotWrite(): void
+    protected function getLib(): MetaSource\Files
     {
-        $lib = $this->getLib();
-        chmod($this->getTargetPath() . 'unable.meta', 0444);
-        $lib->setSource(['unable.meta']);
-        $this->assertFalse($lib->save(new Menu()));
+        return new MetaSource\Files((new Factory())->getClass($this->getTargetPath()), new MetaSource\FileParser(), ['target.meta']);
     }
 
-    protected function getLib(): MetaSource\Storage
+    /**
+     * @throws FilesException
+     * @throws PathsException
+     * @return MetaSource\Files
+     */
+    protected function getFailLib(): MetaSource\Files
     {
-        Key\DirKey::setDir($this->getTargetPath());
-        return new MetaSource\Storage(new Storage(new Key\DirKey(), new Target\Volume()), new MetaSource\FileParser(), ['target.meta']);
-    }
-
-    protected function getFailLib(): MetaSource\Storage
-    {
-        return new MetaSource\Storage(new \XFailStorage(new Key\DefaultKey(), new Target\Memory()), new MetaSource\FileParser(), ['target.meta']);
+        return new MetaSource\Files((new Factory())->getClass(new \XFailStorage(new Key\DefaultKey(), new Target\Memory())), new MetaSource\FileParser(), ['target.meta']);
     }
 }

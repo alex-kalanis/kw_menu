@@ -16,13 +16,13 @@ class MetaProcessorTest extends \CommonTestClass
     public function testMenu(): void
     {
         $lib = $this->getLib();
-        $lib->setKey('target.meta');
+        $lib->setKey(['target.meta']);
         $this->assertTrue($lib->exists());
         $this->assertNotEmpty($lib->getMenu());
         $this->assertEmpty($lib->getWorking());
         $lib->load();
         $this->assertNotEmpty($lib->getWorking());
-        $lib->setKey('copy.meta');
+        $lib->setKey(['copy.meta']);
         $lib->updateInfo('another target', 'another testing', null); // metadata info
         $lib->addEntry('other1.htm', 'ijn', 'uhb', true);
         $lib->updateEntry('dummy3.htm', 'edc', 'rfv', false); // entry info
@@ -38,10 +38,10 @@ class MetaProcessorTest extends \CommonTestClass
     public function testPositions(): void
     {
         $lib = $this->getLib();
-        $lib->setKey('target.meta');
+        $lib->setKey(['target.meta']);
         $this->assertTrue($lib->exists());
         $lib->load();
-        $lib->setKey('copy.meta');
+        $lib->setKey(['copy.meta']);
         $lib->rearrangePositions([ // file => new position
             'dummy4.htm' => 3,
             'dummy2.htm' => 4,
@@ -56,7 +56,7 @@ class MetaProcessorTest extends \CommonTestClass
     public function testNotEntry(): void
     {
         $lib = $this->getLib();
-        $lib->setKey('target.meta');
+        $lib->setKey(['target.meta']);
         $this->assertTrue($lib->exists());
         $lib->load();
         $this->expectException(MenuException::class);
@@ -70,7 +70,7 @@ class MetaProcessorTest extends \CommonTestClass
     public function testNotPositions(): void
     {
         $lib = $this->getLib();
-        $lib->setKey('target.meta');
+        $lib->setKey(['target.meta']);
         $this->assertTrue($lib->exists());
         $lib->load();
         $this->expectException(MenuException::class);
@@ -84,7 +84,7 @@ class MetaProcessorTest extends \CommonTestClass
     public function testNotPositionsItems(): void
     {
         $lib = $this->getLib();
-        $lib->setKey('not-a-file');
+        $lib->setKey(['not-a-file']);
         $this->assertFalse($lib->exists());
         $this->expectException(MenuException::class);
         $lib->rearrangePositions([1 => 3, 2 => 4]);
@@ -97,7 +97,7 @@ class MetaProcessorTest extends \CommonTestClass
     public function testNotPositionsData(): void
     {
         $lib = $this->getLib();
-        $lib->setKey('target.meta');
+        $lib->setKey(['target.meta']);
         $this->assertTrue($lib->exists());
         $lib->load();
         $this->expectException(MenuException::class);

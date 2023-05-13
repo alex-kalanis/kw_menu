@@ -6,6 +6,7 @@ namespace kalanis\kw_menu\MetaSource;
 use kalanis\kw_menu\Interfaces;
 use kalanis\kw_menu\Menu\Entry;
 use kalanis\kw_menu\Menu\Menu;
+use kalanis\kw_menu\Traits\TEscape;
 
 
 /**

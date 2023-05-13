@@ -4,10 +4,10 @@ namespace kalanis\kw_menu\EntriesSource;
 
 
 use kalanis\kw_menu\Interfaces\IEntriesSource;
+use kalanis\kw_menu\Traits\TFilterHtml;
 use kalanis\kw_paths\ArrayPath;
-use kalanis\kw_paths\Path;
-use kalanis\kw_tree as XTree;
-use SplFileInfo;
+use kalanis\kw_paths\Stuff;
+use kalanis\kw_tree\Interfaces\ITree;
 use Traversable;
 
 
@@ -20,14 +20,14 @@ class Tree implements IEntriesSource
 {
     use TFilterHtml;
 
-    /** @var XTree\DataSources\Volume */
+    /** @var ITree */
     protected $tree = null;
     /** @var ArrayPath */
     protected $arrPath = null;
 
-    public function __construct(Path $path)
+    public function __construct(ITree $tree)
     {
-        $this->tree = new XTree\DataSources\Volume($path->getDocumentRoot() . $path->getPathToSystemRoot());
+        $this->tree = $tree;
         $this->arrPath = new ArrayPath();
     }
 
@@ -35,15 +35,12 @@ class Tree implements IEntriesSource
     {
         $this->tree->setStartPath($path);
         $this->tree->wantDeep(false);
-        $this->tree->setFilterCallback([$this, 'filterHtml']);
         $this->tree->process();
         foreach ($this->tree->getRoot()->getSubNodes() as $item) {
-            yield $this->arrPath->setArray($item->getPath())->getFileName();
+            $this->arrPath->setArray($item->getPath());
+            if ($this->filterExt(Stuff::fileExt($this->arrPath->getFileName()))) {
+                yield $this->arrPath->getFileName();
+            }
         }
-    }
-
-    public function filterHtml(SplFileInfo $info): bool
-    {
-        return $this->filterExt($info->getExtension());
     }
 }

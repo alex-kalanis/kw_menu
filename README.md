@@ -10,16 +10,16 @@
 [![Code Coverage](https://scrutinizer-ci.com/g/alex-kalanis/kw_menu/badges/coverage.png?b=master&v=1)](https://scrutinizer-ci.com/g/alex-kalanis/kw_menu/?branch=master)
 
 Mapping menu from different sources and make the tree necessary to process everything.
-This version supports only files as entries in data source. If Storage is in database
-it's possible to map that source. You can also make your own implementation
-of IEntriesSource and IMetaSource to satisfy selection of available entries.
+This version supports as entries files on volume, in storage and from tree package.
+You can also make your own implementation of IEntriesSource and IMetaSource to satisfy
+selection of available entries.
 
 ## PHP Installation
 
 ```
 {
     "require": {
-        "alex-kalanis/kw_menu": "1.0"
+        "alex-kalanis/kw_menu": "2.0"
     }
 }
 ```
