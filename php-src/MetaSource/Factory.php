@@ -51,7 +51,7 @@ class Factory
         } elseif (is_array($params) && isset($params['source'])) {
             return $this->getSource(
                 $params['source'],
-                isset($params['parser']) ? $params['parser'] : null
+                isset($params['parser']) ? $params['parser'] : $parser
             );
         } elseif (is_string($params)) {
             return new Volume($params, $this->getParser($parser));

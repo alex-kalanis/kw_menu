@@ -22,7 +22,11 @@ trait TToString
      */
     protected function toString($content): string
     {
-        if (is_resource($content)) {
+        if (is_null($content)) {
+            throw new MenuException($this->getMnLang()->mnProblematicData());
+        } elseif (is_bool($content)) {
+            throw new MenuException($this->getMnLang()->mnProblematicData());
+        } elseif (is_resource($content)) {
             rewind($content);
             $data = stream_get_contents($content, -1, 0);
             if (false === $data) {
@@ -33,7 +37,11 @@ trait TToString
             // @codeCoverageIgnoreEnd
             return strval($data);
         } else {
-            return strval($content);
+            try {
+                return strval($content);
+            } catch (\Error $ex) {
+                throw new MenuException($ex->getMessage(), $ex->getCode(), $ex);
+            }
         }
     }
 }

@@ -4,9 +4,7 @@ namespace ProcessingTests;
 
 
 use kalanis\kw_files\FilesException;
-use kalanis\kw_menu\EntriesSource;
-use kalanis\kw_menu\MetaProcessor;
-use kalanis\kw_menu\MetaSource;
+use kalanis\kw_menu\MenuFactory;
 use kalanis\kw_menu\MenuException;
 use kalanis\kw_menu\MoreEntries;
 use kalanis\kw_paths\PathsException;
@@ -54,11 +52,6 @@ class FilesTest extends \CommonTestClass
      */
     protected function getLib($params): MoreEntries
     {
-        return new MoreEntries(
-            new MetaProcessor(
-                (new MetaSource\Factory())->getSource($params)
-            ),
-            (new EntriesSource\Factory())->getSource($params)
-        );
+        return (new MenuFactory())->getMenu($params);
     }
 }
