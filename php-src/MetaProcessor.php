@@ -37,8 +37,8 @@ class MetaProcessor
 
     /**
      * @param string[] $metaSource
-     * @return $this
      * @throws MenuException
+     * @return $this
      */
     public function setKey(array $metaSource): self
     {
@@ -47,8 +47,8 @@ class MetaProcessor
     }
 
     /**
-     * @return bool
      * @throws MenuException
+     * @return bool
      */
     public function exists(): bool
     {
@@ -185,7 +185,7 @@ class MetaProcessor
             }
         }
 
-        while (count($matrix) > 0) {
+        while (0 < count($matrix)) {
             foreach ($matrix as $old => &$new) {
                 if (!isset($prepared[$new])) { # nothing on new position
                     $prepared[$new] = $old;

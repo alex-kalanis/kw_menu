@@ -111,9 +111,9 @@ class FilesTest extends \CommonTestClass
     }
 
     /**
-     * @return storages_interfaces\ITarget
      * @throws StorageException
      * Beware - needs root node!
+     * @return storages_interfaces\ITarget
      */
     protected function filledMemory(): storages_interfaces\ITarget
     {

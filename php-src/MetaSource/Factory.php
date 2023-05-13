@@ -43,7 +43,7 @@ class Factory
                 return $params;
             }
             if ($params instanceof CompositeAdapter) {
-                return new Files($params, $this->getParser($parser));
+                return new Files($params, $this->getParser($parser), $this->getMnLang());
             }
             if ($params instanceof IStorage) {
                 return new Storage($params, $this->getParser($parser));
