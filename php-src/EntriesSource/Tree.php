@@ -36,10 +36,12 @@ class Tree implements IEntriesSource
         $this->tree->setStartPath($path);
         $this->tree->wantDeep(false);
         $this->tree->process();
-        foreach ($this->tree->getRoot()->getSubNodes() as $item) {
-            $this->arrPath->setArray($item->getPath());
-            if ($this->filterExt(Stuff::fileExt($this->arrPath->getFileName()))) {
-                yield $this->arrPath->getFileName();
+        if ($root = $this->tree->getRoot()) {
+            foreach ($root->getSubNodes() as $item) {
+                $this->arrPath->setArray($item->getPath());
+                if ($this->filterExt(Stuff::fileExt($this->arrPath->getFileName()))) {
+                    yield $this->arrPath->getFileName();
+                }
             }
         }
     }

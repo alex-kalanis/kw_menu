@@ -16,7 +16,7 @@ class MetaProcessor
 {
     use TLang;
 
-    /** @var Interfaces\IMetaSource|null */
+    /** @var Interfaces\IMetaSource */
     protected $metaSource = null;
     /** @var Menu\Menu */
     protected $menu = null;
@@ -213,11 +213,12 @@ class MetaProcessor
     protected function clearHoles(): void
     {
         $max = $this->highest;
+        /** @var array<int, string> $use */
         $use = [];
         $hole = false;
         $j = 0;
 
-        /** @var Menu\Entry[] $workList */
+        /** @var array<int, string> $workList */
         $workList = [];
         foreach ($this->workList as &$item) {
             $workList[$item->getPosition()] = $item->getId(); # old position contains file ***

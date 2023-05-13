@@ -46,7 +46,7 @@ class Factory
                 return new Files($params, $this->getParser($parser), $this->getMnLang());
             }
             if ($params instanceof IStorage) {
-                return new Storage($params, $this->getParser($parser));
+                return new Storage($params, $this->getParser($parser), $this->getMnLang());
             }
         } elseif (is_array($params) && isset($params['source'])) {
             return $this->getSource(

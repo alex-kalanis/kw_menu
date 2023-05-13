@@ -10,7 +10,7 @@ use kalanis\kw_menu\Interfaces\IMetaSource;
 use kalanis\kw_menu\Interfaces\IMNTranslations;
 use kalanis\kw_menu\Menu\Menu;
 use kalanis\kw_menu\MenuException;
-use kalanis\kw_menu\Traits\TLang;
+use kalanis\kw_menu\Traits\TToString;
 use kalanis\kw_paths\PathsException;
 
 
@@ -21,7 +21,7 @@ use kalanis\kw_paths\PathsException;
  */
 class Files implements IMetaSource
 {
-    use TLang;
+    use TToString;
 
     /** @var string[] */
     protected $key = [];
@@ -64,28 +64,6 @@ class Files implements IMetaSource
             return $this->parser->unpack($this->toString($this->files->readFile($this->key)));
         } catch (FilesException | PathsException $ex) {
             throw new MenuException($ex->getMessage(), $ex->getCode(), $ex);
-        }
-    }
-
-    /**
-     * @param string|resource $content
-     * @throws MenuException
-     * @return string
-     */
-    protected function toString($content): string
-    {
-        if (is_resource($content)) {
-            rewind($content);
-            $data = stream_get_contents($content, -1, 0);
-            if (false === $data) {
-                // @codeCoverageIgnoreStart
-                // must die something with stream reading
-                throw new MenuException($this->getMnLang()->mnCannotOpen());
-            }
-            // @codeCoverageIgnoreEnd
-            return strval($data);
-        } else {
-            return strval($content);
         }
     }
 

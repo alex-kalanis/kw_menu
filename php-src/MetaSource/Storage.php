@@ -5,8 +5,10 @@ namespace kalanis\kw_menu\MetaSource;
 
 use kalanis\kw_menu\Interfaces\IMetaFileParser;
 use kalanis\kw_menu\Interfaces\IMetaSource;
+use kalanis\kw_menu\Interfaces\IMNTranslations;
 use kalanis\kw_menu\Menu\Menu;
 use kalanis\kw_menu\MenuException;
+use kalanis\kw_menu\Traits\TToString;
 use kalanis\kw_paths\PathsException;
 use kalanis\kw_paths\Stuff;
 use kalanis\kw_storage\Interfaces\IStorage;
@@ -20,6 +22,8 @@ use kalanis\kw_storage\StorageException;
  */
 class Storage implements IMetaSource
 {
+    use TToString;
+
     /** @var string[] */
     protected $key = [];
     /** @var IStorage */
@@ -30,10 +34,12 @@ class Storage implements IMetaSource
     /**
      * @param IStorage $storage
      * @param IMetaFileParser $parser
+     * @param IMNTranslations|null $lang
      * @param string[] $metaKey
      */
-    public function __construct(IStorage $storage, IMetaFileParser $parser, array $metaKey = [])
+    public function __construct(IStorage $storage, IMetaFileParser $parser, ?IMNTranslations $lang = null, array $metaKey = [])
     {
+        $this->setMnLang($lang);
         $this->storage = $storage;
         $this->parser = $parser;
         $this->key = $metaKey;
@@ -56,7 +62,7 @@ class Storage implements IMetaSource
     public function load(): Menu
     {
         try {
-            return $this->parser->unpack($this->storage->read(Stuff::arrayToPath($this->key)));
+            return $this->parser->unpack($this->toString($this->storage->read(Stuff::arrayToPath($this->key))));
         } catch (StorageException | PathsException $ex) {
             throw new MenuException($ex->getMessage(), $ex->getCode(), $ex);
         }

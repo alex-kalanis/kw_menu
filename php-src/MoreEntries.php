@@ -82,7 +82,7 @@ class MoreEntries
     protected function fillMissing(): void
     {
         $toRemoval = array_map([$this, 'entryId'], $this->meta->getWorking());
-        $toRemoval = array_combine($toRemoval, array_fill(0, count($toRemoval), true));
+        $toRemoval = (array) array_combine($toRemoval, array_fill(0, count($toRemoval), true));
 
         foreach ($this->dataSource->getFiles($this->groupKey) as $file) {
             $alreadyKnown = false;

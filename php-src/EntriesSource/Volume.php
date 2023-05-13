@@ -29,7 +29,10 @@ class Volume implements IEntriesSource
     public function getFiles(array $path): Traversable
     {
         $dir = Stuff::arrayToPath($path);
-        yield from array_filter(array_filter(scandir($this->rootPath . $dir), [Stuff::class, 'notDots']), [$this, 'filterHtml']);
+        $list = scandir($this->rootPath . $dir);
+        if (false !== $list) {
+            yield from array_filter(array_filter($list, [Stuff::class, 'notDots']), [$this, 'filterHtml']);
+        }
     }
 
     public function filterHtml(string $fileName): bool

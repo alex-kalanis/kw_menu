@@ -85,11 +85,11 @@ class StorageTest extends \CommonTestClass
     protected function getLib(): MetaSource\Storage
     {
         Key\DirKey::setDir($this->getTargetPath());
-        return new MetaSource\Storage(new Storage(new Key\DirKey(), new Target\Volume()), new MetaSource\FileParser(), ['target.meta']);
+        return new MetaSource\Storage(new Storage(new Key\DirKey(), new Target\Volume()), new MetaSource\FileParser());
     }
 
     protected function getFailLib(): MetaSource\Storage
     {
-        return new MetaSource\Storage(new \XFailStorage(new Key\DefaultKey(), new Target\Memory()), new MetaSource\FileParser(), ['target.meta']);
+        return new MetaSource\Storage(new \XFailStorage(new Key\DefaultKey(), new Target\Memory()), new MetaSource\FileParser(), null, ['target.meta']);
     }
 }
