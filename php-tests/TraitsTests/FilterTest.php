@@ -1,6 +1,6 @@
 <?php
 
-namespace MetaSourceTests;
+namespace TraitsTests;
 
 
 use kalanis\kw_menu\Traits\TFilterHtml;

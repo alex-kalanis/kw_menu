@@ -10,9 +10,7 @@ parameters:
 #		- 'php-tests/CommonTestClass.php'
 	bootstrapFiles:
 		- 'php-tests/_autoload.php'
-	ignoreErrors:
-		- '#Parameter \#1 \$va[rl]u?e? of function [si][tn][rt]val expects#'
-		# quality WTF - strval, intval
+#	ignoreErrors:
 #		-
 #			message: '#Cannot call method [a-z]+\(\) on kalanis\\kw_cache\\Cache\\Formatted\|kalanis\\kw_cache\\Interfaces\\ICache\|null\.#'
 #			path: 'php-src/StaticCache.php'
