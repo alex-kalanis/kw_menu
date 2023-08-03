@@ -90,9 +90,9 @@ class FilesTest extends \CommonTestClass
      */
     protected function getLibStorage(): EntriesSource\Files
     {
-        Key\DirKey::setDir('');
+        Key\StaticPrefixKey::setPrefix('');
         return new EntriesSource\Files(
-            (new Factory())->getClass(new Storage(new Key\DirKey(), $this->filledMemory()))
+            (new Factory())->getClass(new Storage(new Key\StaticPrefixKey(), $this->filledMemory()))
         );
     }
 
@@ -104,9 +104,9 @@ class FilesTest extends \CommonTestClass
      */
     protected function getLibStorageFail(): EntriesSource\Files
     {
-        Key\DirKey::setDir('');
+        Key\StaticPrefixKey::setPrefix('');
         return new EntriesSource\Files(
-            (new Factory())->getClass(new XFailStorage(new Key\DirKey(), new Target\Memory()))
+            (new Factory())->getClass(new XFailStorage(new Key\StaticPrefixKey(), new Target\Memory()))
         );
     }
 

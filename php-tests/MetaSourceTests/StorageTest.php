@@ -84,8 +84,8 @@ class StorageTest extends \CommonTestClass
 
     protected function getLib(): MetaSource\Storage
     {
-        Key\DirKey::setDir($this->getTargetPath());
-        return new MetaSource\Storage(new Storage(new Key\DirKey(), new Target\Volume()), new MetaSource\FileParser());
+        Key\StaticPrefixKey::setPrefix($this->getTargetPath());
+        return new MetaSource\Storage(new Storage(new Key\StaticPrefixKey(), new Target\Volume()), new MetaSource\FileParser());
     }
 
     protected function getFailLib(): MetaSource\Storage

@@ -44,8 +44,8 @@ class StorageTest extends \CommonTestClass
 
     protected function getLib(): EntriesSource\Storage
     {
-        Key\DirKey::setDir($this->getTargetPath());
-        return new EntriesSource\Storage(new Storage(new Key\DirKey(), new Target\Volume()));
+        Key\StaticPrefixKey::setPrefix($this->getTargetPath());
+        return new EntriesSource\Storage(new Storage(new Key\StaticPrefixKey(), new Target\Volume()));
     }
 
     protected function getFailLib(): EntriesSource\Storage
